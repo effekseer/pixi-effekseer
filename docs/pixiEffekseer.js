@@ -5,12 +5,13 @@ class EffekseerRenderer extends PIXI.Sprite
   {
     super();
     this._gl = null;
-    this.effekseer = null;
   }
 
   _init()
   {
     effekseer.init(this._gl);
+	effekseer.setProjectionOrthographic(this._windowWidth, this._windowHeight, 0.1, 100.0);
+	effekseer.setCameraLookAt(0.0, 0.0, 10.0, 0.0, 0.0, 0.0,0.0,1.0,0.0);
   }
 
   _update()
@@ -61,9 +62,10 @@ class EffekseerEmitter extends PIXI.Sprite
   _update()
   {
     if(this.handle == null)
-      {
-        this.handle = effekseer.play(this._effect, 0.0, 0.0, 0.0);
-      }
+    {
+      this.handle = effekseer.play(this._effect);
+      //this.handle.setScale( 20.0, 20.0, 20.0 )
+    }
   }
 
   _renderWebGL(renderer)

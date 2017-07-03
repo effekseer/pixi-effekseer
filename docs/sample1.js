@@ -10,4 +10,10 @@ var effekseerEmitter = new PIXI.EffekseerEmitter('Resource/Laser01.efk');
 stage.addChild(effekseerRenderer);
 stage.addChild(effekseerEmitter);
 
-renderer.render(stage);
+function animate()
+{
+  requestAnimationFrame(animate);
+  renderer.render(stage);
+}
+
+requestAnimationFrame(animate);
