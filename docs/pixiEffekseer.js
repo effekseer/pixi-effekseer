@@ -49,22 +49,23 @@ class EffekseerEmitter extends PIXI.Sprite
     super();
       this._gl = null;
       this._path = path;
-    this._renderer = null;
+      this._renderer = null;
       this._effect = null;
       this.handle = null;
+      this.isLoaded = false;
   }
 
   _init()
   {
-    this._effect = effekseer.loadEffect(this._path);
+    this._effect = effekseer.loadEffect(this._path, function(){ this.isLoaded=true; }.bind(this));
   }
 
   _update()
   {
-    if(this.handle == null)
+    if(this.handle == null && this.isLoaded)
     {
       this.handle = effekseer.play(this._effect);
-      //this.handle.setScale( 20.0, 20.0, 20.0 )
+      this.handle.setScale( 20.0, 20.0, 20.0 );
     }
   }
 
