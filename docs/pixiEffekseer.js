@@ -12,8 +12,8 @@ class EffekseerRenderer extends PIXI.Sprite
   _init()
   {
     effekseer.init(this._gl);
-  	effekseer.setProjectionOrthographic(this._windowWidth, this._windowHeight, 1.0, 400.0);
-  	effekseer.setCameraMatrix(
+    effekseer.setProjectionOrthographic(this._windowWidth, this._windowHeight, 1.0, 400.0);
+    effekseer.setCameraMatrix(
       [
         1,0,0,0,
         0,1,0,0,
@@ -53,24 +53,27 @@ class EffekseerRenderer extends PIXI.Sprite
   }
 }
 
-
 class EffekseerEmitter extends PIXI.Sprite
 {
   constructor(path)
   {
     super();
-      this._gl = null;
-      this._path = path;
-      this._renderer = null;
-      this._effect = null;
-      this.handle = null;
-      this.isLoaded = false;
-      this._commands = [];
+    this._gl = null;
+    this._path = path;
+    this._renderer = null;
+    this._effect = null;
+    this.handle = null;
+    this.isLoaded = false;
+    this.causedError = false;
+    this._commands = [];
   }
 
   _init()
   {
-    this._effect = effekseer.loadEffect(this._path, function(){ this.isLoaded=true; }.bind(this));
+    this._effect = effekseer.loadEffect(
+      this._path,
+      function(){ this.isLoaded=true; }.bind(this),
+      function(){ this.causedError=true; }.bind(this));
   }
 
   _update()
@@ -79,6 +82,11 @@ class EffekseerEmitter extends PIXI.Sprite
     {
       this.handle = effekseer.play(this._effect);
       this._commands.forEach(function (v) { v(); });
+    }
+
+    if(!this.exists() || this.causedError)
+    {
+      this.parent.removeChild(this);
     }
   }
 
@@ -103,7 +111,15 @@ class EffekseerEmitter extends PIXI.Sprite
    */
   setRotation(x, y, z)
   {
-    this.handle.setRotation(x,y,z);
+    if (this.isLoaded)
+    {
+      this.handle.setRotation(x,y,z);
+    }
+    else
+    {
+      var f = function () { this.handle.setRotation(x,y,z); }.bind(this);
+      this._commands.push(f);
+    }
   }
 
   /**
@@ -160,7 +176,14 @@ class EffekseerEmitter extends PIXI.Sprite
    */
   exists()
   {
-    return !!Core.Exists(this.handle);
+    if (this.isLoaded && this.handle != null && this.handle.exists != null)
+    {
+      return this.handle.exists;
+    }
+    else
+    {
+      return true;
+    }
   }
 
   /**
@@ -174,11 +197,6 @@ class EffekseerEmitter extends PIXI.Sprite
   isInitialized()
   {
     return this.isLoaded && this.handle !==null;
-  }
-
-  isPlaying()
-  {
-    return  !this.isInitialized()||  this.exists();
   }
 }
 
