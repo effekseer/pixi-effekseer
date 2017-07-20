@@ -160,14 +160,22 @@ class EffekseerEmitter extends PIXI.Sprite
   }
 
   /**
-	* Set the target location of this effect instance.
-	* @param {number} x X value of target location
-	* @param {number} y Y value of target location
-	* @param {number} z Z value of target location
-	*/
+    * Set the target location of this effect instance.
+    * @param {number} x X value of target location
+    * @param {number} y Y value of target location
+    * @param {number} z Z value of target location
+    */
   setTargetPosition(x, y, z)
   {
-    this.handle.setTargetLocation(x,y,z);
+    if (this.isLoaded)
+    {
+      this.handle.setTargetLocation(x,y,z);
+    }
+    else
+    {
+      var f = function () { this.handle.setTargetLocation(x,y,z); }.bind(this);
+      this._commands.push(f);
+    }
   }
 
   /**
