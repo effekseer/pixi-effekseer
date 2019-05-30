@@ -12,8 +12,8 @@ class EffekseerRenderer extends PIXI.Sprite
   _init()
   {
     effekseer.init(this._gl);
-    effekseer.setProjectionOrthographic(this._windowWidth, this._windowHeight, 1.0, 400.0);
-    effekseer.setCameraMatrix(
+  	effekseer.setProjectionOrthographic(this._windowWidth, this._windowHeight, 1.0, 400.0);
+  	effekseer.setCameraMatrix(
       [
         1,0,0,0,
         0,1,0,0,
@@ -22,17 +22,17 @@ class EffekseerRenderer extends PIXI.Sprite
       ])
   }
 
-  _update()
+  _updateEffekseer()
   {
     effekseer.update();
   }
 
-  _render()
+  _renderEffekseer()
   {
     effekseer.draw();
   }
 
-  _renderWebGL(renderer)
+  _render(renderer)
   {
     if(this._gl == null)
     {
@@ -43,37 +43,34 @@ class EffekseerRenderer extends PIXI.Sprite
     }
 
     // Container of pixi does not have update function.
-    this._update();
-    this._render();
+    this._updateEffekseer();
+    this._renderEffekseer();
 
-    super._renderWebGL(renderer);
+    super._render(renderer);
   }
   setCameraMatrix(){
     const e = effekseer;
   }
 }
 
+
 class EffekseerEmitter extends PIXI.Sprite
 {
   constructor(path)
   {
     super();
-    this._gl = null;
-    this._path = path;
-    this._renderer = null;
-    this._effect = null;
-    this.handle = null;
-    this.isLoaded = false;
-    this.causedError = false;
-    this._commands = [];
+      this._gl = null;
+      this._path = path;
+      this._renderer = null;
+      this._effect = null;
+      this.handle = null;
+      this.isLoaded = false;
+      this._commands = [];
   }
 
   _init()
   {
-    this._effect = effekseer.loadEffect(
-      this._path,
-      function(){ this.isLoaded=true; }.bind(this),
-      function(){ this.causedError=true; }.bind(this));
+    this._effect = effekseer.loadEffect(this._path, function(){ this.isLoaded=true; }.bind(this));
   }
 
   _update()
@@ -83,14 +80,9 @@ class EffekseerEmitter extends PIXI.Sprite
       this.handle = effekseer.play(this._effect);
       this._commands.forEach(function (v) { v(); });
     }
-
-    if(!this.exists() || this.causedError)
-    {
-      this.parent.removeChild(this);
-    }
   }
 
-  _renderWebGL(renderer)
+  _render(renderer)
   {
     if(this._gl == null)
     {
@@ -100,7 +92,7 @@ class EffekseerEmitter extends PIXI.Sprite
 
     // Container of pixi does not have update function.
     this._update();
-    super._renderWebGL(renderer);
+    super._render(renderer);
   }
 
   /**
@@ -111,15 +103,7 @@ class EffekseerEmitter extends PIXI.Sprite
    */
   setRotation(x, y, z)
   {
-    if (this.isLoaded)
-    {
-      this.handle.setRotation(x,y,z);
-    }
-    else
-    {
-      var f = function () { this.handle.setRotation(x,y,z); }.bind(this);
-      this._commands.push(f);
-    }
+    this.handle.setRotation(x,y,z);
   }
 
   /**
@@ -160,22 +144,14 @@ class EffekseerEmitter extends PIXI.Sprite
   }
 
   /**
-    * Set the target location of this effect instance.
-    * @param {number} x X value of target location
-    * @param {number} y Y value of target location
-    * @param {number} z Z value of target location
-    */
+	* Set the target location of this effect instance.
+	* @param {number} x X value of target location
+	* @param {number} y Y value of target location
+	* @param {number} z Z value of target location
+	*/
   setTargetPosition(x, y, z)
   {
-    if (this.isLoaded)
-    {
-      this.handle.setTargetLocation(x,y,z);
-    }
-    else
-    {
-      var f = function () { this.handle.setTargetLocation(x,y,z); }.bind(this);
-      this._commands.push(f);
-    }
+    this.handle.setTargetLocation(x,y,z);
   }
 
   /**
@@ -184,14 +160,7 @@ class EffekseerEmitter extends PIXI.Sprite
    */
   exists()
   {
-    if (this.isLoaded && this.handle != null && this.handle.exists != null)
-    {
-      return this.handle.exists;
-    }
-    else
-    {
-      return true;
-    }
+    return !!Core.Exists(this.handle);
   }
 
   /**
@@ -205,6 +174,11 @@ class EffekseerEmitter extends PIXI.Sprite
   isInitialized()
   {
     return this.isLoaded && this.handle !==null;
+  }
+
+  isPlaying()
+  {
+    return  !this.isInitialized()||  this.exists();
   }
 }
 
