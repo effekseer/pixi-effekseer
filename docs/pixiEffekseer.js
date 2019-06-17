@@ -42,11 +42,21 @@ class EffekseerRenderer extends PIXI.Sprite
       this._init();
     }
 
+    renderer.batch.flush();
+
+    // reset vao (to prevent to change state with effekseer)
+    renderer.geometry.reset();
+
     // Container of pixi does not have update function.
     this._updateEffekseer();
     this._renderEffekseer();
 
-    super._render(renderer);
+    // effekseer renderer makes state dirty
+    renderer.texture.reset();
+    renderer.geometry.reset();
+    renderer.state.reset();
+    renderer.shader.reset();
+        
   }
   setCameraMatrix(){
     const e = effekseer;
@@ -90,9 +100,12 @@ class EffekseerEmitter extends PIXI.Sprite
       this._init();
     }
 
+    // reset because textue is made null when loading
+    renderer.batch.flush();
+    renderer.texture.reset();
+
     // Container of pixi does not have update function.
     this._update();
-    super._render(renderer);
   }
 
   /**
