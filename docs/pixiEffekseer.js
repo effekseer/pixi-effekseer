@@ -36,6 +36,9 @@ class EffekseerRenderer extends PIXI.Sprite
   {
     if(this._gl == null)
     {
+      // reset vao (to prevent to change state with effekseer)
+      renderer.geometry.reset();
+
       this._gl = renderer.gl;
       this._windowWidth = renderer.view.width;
       this._windowHeight = renderer.view.height;
