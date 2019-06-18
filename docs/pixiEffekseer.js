@@ -54,13 +54,25 @@ class EffekseerRenderer extends PIXI.Sprite
     this._updateEffekseer();
     this._renderEffekseer();
 
+    // Debug code
+    // this._gl.clearColor(255, 0, 0, 255);
+    // this._gl.clear(this._gl.COLOR_BUFFER_BIT | this._gl.DEPTH_BUFFER_BIT);
+
     // effekseer renderer makes state dirty
     renderer.texture.reset();
     renderer.geometry.reset();
     renderer.state.reset();
-    renderer.shader.reset();
-        
+    renderer.shader.reset();     
   }
+
+  _calculateBounds()
+  {
+    this._bounds.minX = 0;
+    this._bounds.minY = 0;
+    this._bounds.maxX = this._windowWidth;
+    this._bounds.maxY = this._windowHeight;
+  }
+
   setCameraMatrix(){
     const e = effekseer;
   }
@@ -106,7 +118,8 @@ class EffekseerEmitter extends PIXI.Sprite
     // reset because textue is made null when loading
     renderer.batch.flush();
     renderer.texture.reset();
-
+    renderer.geometry.reset();
+    
     // Container of pixi does not have update function.
     this._update();
   }
