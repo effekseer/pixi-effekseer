@@ -12,14 +12,6 @@ class EffekseerRenderer extends PIXI.Sprite
   _init()
   {
     effekseer.init(this._gl);
-  	effekseer.setProjectionOrthographic(this._windowWidth, this._windowHeight, 1.0, 400.0);
-  	effekseer.setCameraMatrix(
-      [
-        1,0,0,0,
-        0,1,0,0,
-        0,0,1,0,
-        -this._windowWidth / 2, this._windowHeight / 2, 200.0, 1
-      ])
   }
 
   _updateEffekseer()
@@ -49,6 +41,30 @@ class EffekseerRenderer extends PIXI.Sprite
 
     // reset vao (to prevent to change state with effekseer)
     renderer.geometry.reset();
+
+    // flip vertially (because of OpenGL specification)
+    if(renderer.renderTexture.current != null)
+    {
+      effekseer.setProjectionOrthographic(this._windowWidth, -this._windowHeight, 1.0, 400.0);
+      effekseer.setCameraMatrix(
+        [
+          1,0,0,0,
+          0,1,0,0,
+          0,0,1,0,
+          -this._windowWidth / 2, this._windowHeight / 2, 200.0, 1
+        ])
+    }
+    else
+    {
+      effekseer.setProjectionOrthographic(this._windowWidth, this._windowHeight, 1.0, 400.0);
+      effekseer.setCameraMatrix(
+        [
+          1,0,0,0,
+          0,1,0,0,
+          0,0,1,0,
+          -this._windowWidth / 2, this._windowHeight / 2, 200.0, 1
+        ])
+    }
 
     // Container of pixi does not have update function.
     this._updateEffekseer();
