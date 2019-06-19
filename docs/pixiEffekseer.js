@@ -12,6 +12,7 @@ class EffekseerRenderer extends PIXI.Sprite
   _init()
   {
     effekseer.init(this._gl);
+    console.log(effekseer.isVertexArrayObjectSupported());
   }
 
   _updateEffekseer()
@@ -29,12 +30,19 @@ class EffekseerRenderer extends PIXI.Sprite
     if(this._gl == null)
     {
       // reset vao (to prevent to change state with effekseer)
-      renderer.geometry.reset();
+      // renderer.geometry.reset();
+
+      var binding1 = renderer.gl.getParameter(renderer.gl.ARRAY_BUFFER_BINDING);
+      var binding2 = renderer.gl.getParameter(renderer.gl.ELEMENT_ARRAY_BUFFER_BINDING);
 
       this._gl = renderer.gl;
       this._windowWidth = renderer.view.width;
       this._windowHeight = renderer.view.height;
       this._init();
+
+      renderer.gl.bindBuffer(renderer.gl.ARRAY_BUFFER, binding1);
+      renderer.gl.bindBuffer(renderer.gl.ELEMENT_ARRAY_BUFFER, binding2);
+
     }
 
     renderer.batch.flush();
@@ -132,9 +140,9 @@ class EffekseerEmitter extends PIXI.Sprite
     }
 
     // reset because textue is made null when loading
-    renderer.batch.flush();
-    renderer.texture.reset();
-    renderer.geometry.reset();
+    // renderer.batch.flush();
+    // renderer.texture.reset();
+    // renderer.geometry.reset();
     
     // Container of pixi does not have update function.
     this._update();
