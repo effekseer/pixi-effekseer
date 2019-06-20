@@ -114,6 +114,12 @@ class EffekseerEmitter extends PIXI.Sprite
       this._effect = null;
       this.handle = null;
       this.isLoaded = false;
+
+      /**
+        * Whether it does play the effect on addChild()
+        * @type {boolean}
+      */
+      this.playOnAdd = true;
       this._commands = [];
   }
 
@@ -124,7 +130,7 @@ class EffekseerEmitter extends PIXI.Sprite
 
   _update()
   {
-    if(this.handle == null && this.isLoaded)
+    if(this.handle == null && this.isLoaded && this.playOnStart)
     {
       this.handle = effekseer.play(this._effect);
       this._commands.forEach(function (v) { v(); });
@@ -217,6 +223,18 @@ class EffekseerEmitter extends PIXI.Sprite
   }
 
   /**
+   * Play effect.
+   */
+  play()
+  {
+    if(this.handle == null && this.isLoaded)
+    {
+      this.handle = effekseer.play(this._effect);
+      this._commands.forEach(function (v) { v(); });
+    }
+  }
+
+  /**
    * Stop this effect instance.
    */
   stop()
@@ -231,7 +249,7 @@ class EffekseerEmitter extends PIXI.Sprite
 
   isPlaying()
   {
-    return  !this.isInitialized()||  this.exists();
+    return  !this.isInitialized() ||  this.exists();
   }
 }
 

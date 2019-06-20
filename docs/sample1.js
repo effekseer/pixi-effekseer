@@ -22,6 +22,10 @@ stage.addChild(effekseerEmitter);
 effekseerEmitter.setPosition(128.0, 128.0)
 effekseerEmitter.setScale(20.0, 20.0, 20.0)
 
+// do not play on add automatically
+// you need to call effekseerEmitter.play(); with yourself
+// effekseerEmitter.playOnAdd = false;
+
 function animate()
 {
   requestAnimationFrame(animate);
