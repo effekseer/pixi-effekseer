@@ -130,7 +130,7 @@ class EffekseerEmitter extends PIXI.Sprite
 
   _update()
   {
-    if(this.handle == null && this.isLoaded && this.playOnStart)
+    if(this.handle == null && this.isLoaded && this.playOnAdd)
     {
       this.handle = effekseer.play(this._effect);
       this._commands.forEach(function (v) { v(); });
