@@ -200,10 +200,13 @@
 
     /**
      * if returned false, this effect is end of playing.
-     * @property {boolean}
      */
     exists() {
-      return !!Core.Exists(this.handle);
+      if(this.handle == null) {
+        return false;
+      }
+
+      return this.handle.exists;
     }
 
     /**
@@ -224,9 +227,12 @@
     }
 
     isInitialized() {
-      return this.isLoaded && this.handle !== null;
+      return this.isLoaded;
     }
 
+    /**
+     * deprecation
+     */
     isPlaying() {
       return !this.isInitialized() || this.exists();
     }
