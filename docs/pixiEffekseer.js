@@ -102,14 +102,35 @@
     }
   }
 
-
-  class EffekseerEmitter extends PIXI.Sprite {
+  class EffekseerEffect {
     constructor(path) {
-      super();
       this._gl = null;
       this._path = path;
-      this._renderer = null;
       this._effect = null;
+      this.isLoaded = false;
+      this.isFailedToLoad = false;
+
+      this._effect = effekseer.loadEffect(
+        this._path, 
+        function () { this.isLoaded = true; }.bind(this),
+        function () { this.isFailedToLoad = true; }.bind(this));
+    }
+
+    	/**
+		 * Release the effect. Don't touch the instance of effect after released.
+		 */
+    destroy() {
+      effekseer.releaseEffect(this._effect);
+      this._effect = null;
+    }
+  }
+
+  class EffekseerEmitter extends PIXI.Sprite {
+    constructor(effect) {
+      super();
+      this._gl = null;
+      this._renderer = null;
+      this._effect = effect;
       this.handle = null;
       this.isLoaded = false;
 
@@ -122,11 +143,11 @@
     }
 
     _init() {
-      this._effect = effekseer.loadEffect(this._path, function () { this.isLoaded = true; }.bind(this));
+      // empty
     }
 
     _update() {
-      if (this.handle == null && this.isLoaded && this.playOnAdd) {
+      if (this.handle == null && this._effect.isLoaded && this.playOnAdd) {
         this.handle = effekseer.play(this._effect);
         this._commands.forEach(function (v) { v(); });
       }
@@ -200,10 +221,13 @@
 
     /**
      * if returned false, this effect is end of playing.
-     * @property {boolean}
      */
     exists() {
-      return !!Core.Exists(this.handle);
+      if(this.handle == null) {
+        return false;
+      }
+
+      return this.handle.exists;
     }
 
     /**
@@ -224,9 +248,12 @@
     }
 
     isInitialized() {
-      return this.isLoaded && this.handle !== null;
+      return this.isLoaded;
     }
 
+    /**
+     * deprecation
+     */
     isPlaying() {
       return !this.isInitialized() || this.exists();
     }
@@ -237,6 +264,7 @@
   if (PIXI) {
     PIXI.EffekseerRenderer = EffekseerRenderer;
     PIXI.EffekseerEmitter = EffekseerEmitter;
+    PIXI.EffekseerEffect = EffekseerEffect;
   }
   else {
     console.error('Error: Cannot find global variable `PIXI`, Effekseer plguin will not be installed.');
