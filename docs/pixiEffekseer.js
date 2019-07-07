@@ -116,9 +116,9 @@
         function () { this.isFailedToLoad = true; }.bind(this));
     }
 
-    	/**
-		 * Release the effect. Don't touch the instance of effect after released.
-		 */
+      /**
+      * Release the effect. Don't touch the instance of effect after released.
+      */
     destroy() {
       effekseer.releaseEffect(this._effect);
       this._effect = null;
@@ -148,7 +148,7 @@
 
     _update() {
       if (this.handle == null && this._effect.isLoaded && this.playOnAdd) {
-        this.handle = effekseer.play(this._effect);
+        this.handle = effekseer.play(this._effect._effect);
         this._commands.forEach(function (v) { v(); });
       }
     }
@@ -235,7 +235,7 @@
      */
     play() {
       if (this.handle == null && this.isLoaded) {
-        this.handle = effekseer.play(this._effect);
+        this.handle = effekseer.play(this._effect._effect);
         this._commands.forEach(function (v) { v(); });
       }
     }

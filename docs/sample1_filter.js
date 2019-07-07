@@ -15,8 +15,9 @@ icon.position.y = 256;
 icon.filters = [filter];
 stage.addChild(icon);
 
+var effect = new PIXI.EffekseerEffect('Resource/Laser01.efk');
 var effekseerRenderer = new PIXI.EffekseerRenderer();
-var effekseerEmitter = new PIXI.EffekseerEmitter('Resource/Laser01.efk');
+var effekseerEmitter = new PIXI.EffekseerEmitter(effect);
 
 stage.addChild(effekseerRenderer);
 stage.addChild(effekseerEmitter);
