@@ -103,7 +103,7 @@
   }
 
   class EffekseerEffect {
-    constructor(path) {
+    constructor(path, scale = 1.0) {
       this._gl = null;
       this._path = path;
       this._effect = null;
@@ -112,6 +112,7 @@
 
       this._effect = effekseer.loadEffect(
         this._path, 
+        scale,
         function () { this.isLoaded = true; }.bind(this),
         function () { this.isFailedToLoad = true; }.bind(this));
     }
