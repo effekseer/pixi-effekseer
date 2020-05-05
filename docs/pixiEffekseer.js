@@ -29,20 +29,22 @@
   }
 
   class EffekseerRenderer extends PIXI.Sprite {
-    constructor() {
+    constructor(gl) {
       super();
-      this._gl = null;
+      this._gl = gl;
 
       this._context = _context_allocate();
+
+      this.on('added', function() {
+        this._context.init(this._gl);
+        this._windowWidth = this._gl.drawingBufferWidth;
+        this._windowHeight = this._gl.drawingBufferHeight;
+      });
 
       this.on('removed', function() {
         this._context.release();
         this._context = null;
       });
-    }
-
-    _init() {
-      this._context.init(this._gl);
     }
 
     _updateEffekseer() {
@@ -54,32 +56,6 @@
     }
 
     _render(renderer) {
-      if (this._gl == null) {
-        // reset vao (to prevent to change state with effekseer)
-        // renderer.geometry.reset();
-
-        var ext = renderer.gl.getExtension('OES_vertex_array_object');
-        var binding1 = renderer.gl.getParameter(renderer.gl.ARRAY_BUFFER_BINDING);
-        var binding2 = renderer.gl.getParameter(renderer.gl.ELEMENT_ARRAY_BUFFER_BINDING);
-        var binding_vao = null;
-        if (ext != null) {
-          binding_vao = renderer.gl.getParameter(ext.VERTEX_ARRAY_BINDING_OES);
-        }
-
-        this._gl = renderer.gl;
-        this._windowWidth = renderer.view.width;
-        this._windowHeight = renderer.view.height;
-        this._init();
-
-        if (ext != null) {
-          var binding_debug = renderer.gl.getParameter(ext.VERTEX_ARRAY_BINDING_OES);
-          ext.bindVertexArrayOES(binding_vao);
-        }
-
-        renderer.gl.bindBuffer(renderer.gl.ARRAY_BUFFER, binding1);
-        renderer.gl.bindBuffer(renderer.gl.ELEMENT_ARRAY_BUFFER, binding2);
-
-      }
 
       renderer.batch.flush();
 

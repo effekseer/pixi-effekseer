@@ -14,7 +14,7 @@ function main() {
   icon.position.y = 256;
   stage.addChild(icon);
 
-  var effekseerRenderer = new PIXI.EffekseerRenderer();
+  var effekseerRenderer = new PIXI.EffekseerRenderer(renderer.gl);
 
   stage.addChild(effekseerRenderer);
 
@@ -22,7 +22,7 @@ function main() {
 
   function animate() {
 
-    if(frameCount == 100)
+    if(frameCount == 10)
     {
       var effect = new PIXI.EffekseerEffect('Resource/Laser01.efk');
       var effekseerEmitter = new PIXI.EffekseerEmitter(effect);

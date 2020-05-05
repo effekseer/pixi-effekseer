@@ -17,7 +17,7 @@ function main() {
   stage.addChild(icon);
 
   var effect = new PIXI.EffekseerEffect('Resource/Laser01.efk');
-  var effekseerRenderer = new PIXI.EffekseerRenderer();
+  var effekseerRenderer = new PIXI.EffekseerRenderer(renderer.gl);
   var effekseerEmitter = new PIXI.EffekseerEmitter(effect);
 
   stage.addChild(effekseerRenderer);
