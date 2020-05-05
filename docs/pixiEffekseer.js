@@ -1,23 +1,62 @@
 (function () {
   'use strict'
 
+  class Context
+  {
+    static _instance = null;
+
+    static allocate() {
+
+      if(this._instance == null)
+      {
+        this._instance = new Context();
+      }
+      else {
+        this._instance._reference += 1;
+      }
+
+     return this._instance;
+    }
+
+    constructor() {
+      this.context = effekseer.createContext();
+      this._reference = 1;
+    }
+
+    release() {
+      this._reference-= 1;
+
+      if(this._reference == 0)
+      {
+        this.context.release();
+        _instance = null;
+      }
+    }
+  }
+
   class EffekseerRenderer extends PIXI.Sprite {
     constructor() {
       super();
       this._gl = null;
+
+      this._context = Context.allocate();
+
+      this.on('removed', function() {
+        this._context.release();
+        this._context = null;
+      });
     }
 
     _init() {
-      effekseer.init(this._gl);
-      console.log(effekseer.isVertexArrayObjectSupported());
+      this._context.context.init(this._gl);
     }
 
     _updateEffekseer() {
-      effekseer.update();
+      this._context.context.update();
     }
 
     _renderEffekseer() {
-      effekseer.draw();
+      this._context.context.draw();
     }
 
     _render(renderer) {
@@ -55,8 +94,8 @@
 
       // flip vertially (because of OpenGL specification)
       if (renderer.renderTexture.current != null) {
-        effekseer.setProjectionOrthographic(this._windowWidth, -this._windowHeight, 1.0, 400.0);
-        effekseer.setCameraMatrix(
+        this._context.context.setProjectionOrthographic(this._windowWidth, -this._windowHeight, 1.0, 400.0);
+        this._context.context.setCameraMatrix(
           [
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -65,8 +104,8 @@
           ])
       }
       else {
-        effekseer.setProjectionOrthographic(this._windowWidth, this._windowHeight, 1.0, 400.0);
-        effekseer.setCameraMatrix(
+        this._context.context.setProjectionOrthographic(this._windowWidth, this._windowHeight, 1.0, 400.0);
+        this._context.context.setCameraMatrix(
           [
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -96,10 +135,6 @@
       this._bounds.maxX = this._windowWidth;
       this._bounds.maxY = this._windowHeight;
     }
-
-    setCameraMatrix() {
-      const e = effekseer;
-    }
   }
 
   class EffekseerEffect {
@@ -110,7 +145,9 @@
       this.isLoaded = false;
       this.isFailedToLoad = false;
 
-      this._effect = effekseer.loadEffect(
+      this._context = Context.allocate();
+
+      this._effect = this._context.context.loadEffect(
         this._path, 
         scale,
         function () { this.isLoaded = true; }.bind(this),
@@ -121,8 +158,10 @@
       * Release the effect. Don't touch the instance of effect after released.
       */
     destroy() {
-      effekseer.releaseEffect(this._effect);
+      this._context.context.releaseEffect(this._effect);
       this._effect = null;
+      this._context.release();
+      this._context = null;
     }
   }
 
@@ -134,6 +173,13 @@
       this._effect = effect;
       this.handle = null;
       this.isLoaded = false;
+
+      this._context = Context.allocate();
+
+      this.on('removed', function() {
+        this._context.release();
+        this._context = null;
+      });
 
       /**
         * Whether it does play the effect on addChild()
@@ -149,7 +195,7 @@
 
     _update() {
       if (this.handle == null && this._effect.isLoaded && this.playOnAdd) {
-        this.handle = effekseer.play(this._effect._effect);
+        this.handle = this._context.context.play(this._effect._effect);
         this._commands.forEach(function (v) { v(); });
       }
     }
@@ -236,7 +282,7 @@
      */
     play() {
       if (this.handle == null && this.isLoaded) {
-        this.handle = effekseer.play(this._effect._effect);
+        this.handle = this._context.context.play(this._effect._effect);
         this._commands.forEach(function (v) { v(); });
       }
     }

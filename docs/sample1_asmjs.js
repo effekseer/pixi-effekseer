@@ -36,7 +36,7 @@ function main() {
   requestAnimationFrame(animate);
 }
 
-useWASM = true;
+useWASM = false;
 
 if(useWASM) {
   // if you use wasm version
