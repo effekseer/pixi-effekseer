@@ -1,36 +1,30 @@
 (function () {
   'use strict'
 
-  class Context
-  {
-    static _instance = null;
+  var _context_instance = null;
+  var _context_reference = 0;
 
-    static allocate() {
+  function _context_allocate() {
 
-      if(this._instance == null)
-      {
-        this._instance = new Context();
-      }
-      else {
-        this._instance._reference += 1;
-      }
-
-     return this._instance;
+    if(_context_instance == null)
+    {
+      _context_instance = effekseer.createContext();
+      _context_reference += 1;
+    }
+    else {
+      _context_reference += 1;
     }
 
-    constructor() {
-      this.context = effekseer.createContext();
-      this._reference = 1;
-    }
+   return _context_instance;
+  }
 
-    release() {
-      this._reference-= 1;
+  function _context_free() {
+    _context_reference-= 1;
 
-      if(this._reference == 0)
-      {
-        this.context.release();
-        _instance = null;
-      }
+    if(_context_reference == 0)
+    {
+      _context_instance.release();
+      _context_instance = null;
     }
   }
 
@@ -39,7 +33,7 @@
       super();
       this._gl = null;
 
-      this._context = Context.allocate();
+      this._context = _context_allocate();
 
       this.on('removed', function() {
         this._context.release();
@@ -48,15 +42,15 @@
     }
 
     _init() {
-      this._context.context.init(this._gl);
+      this._context.init(this._gl);
     }
 
     _updateEffekseer() {
-      this._context.context.update();
+      this._context.update();
     }
 
     _renderEffekseer() {
-      this._context.context.draw();
+      this._context.draw();
     }
 
     _render(renderer) {
@@ -94,8 +88,8 @@
 
       // flip vertially (because of OpenGL specification)
       if (renderer.renderTexture.current != null) {
-        this._context.context.setProjectionOrthographic(this._windowWidth, -this._windowHeight, 1.0, 400.0);
-        this._context.context.setCameraMatrix(
+        this._context.setProjectionOrthographic(this._windowWidth, -this._windowHeight, 1.0, 400.0);
+        this._context.setCameraMatrix(
           [
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -104,8 +98,8 @@
           ])
       }
       else {
-        this._context.context.setProjectionOrthographic(this._windowWidth, this._windowHeight, 1.0, 400.0);
-        this._context.context.setCameraMatrix(
+        this._context.setProjectionOrthographic(this._windowWidth, this._windowHeight, 1.0, 400.0);
+        this._context.setCameraMatrix(
           [
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -145,9 +139,9 @@
       this.isLoaded = false;
       this.isFailedToLoad = false;
 
-      this._context = Context.allocate();
+      this._context = _context_allocate();
 
-      this._effect = this._context.context.loadEffect(
+      this._effect = this._context.loadEffect(
         this._path, 
         scale,
         function () { this.isLoaded = true; }.bind(this),
@@ -158,9 +152,9 @@
       * Release the effect. Don't touch the instance of effect after released.
       */
     destroy() {
-      this._context.context.releaseEffect(this._effect);
+      this._context.releaseEffect(this._effect);
       this._effect = null;
-      this._context.release();
+      _context_free();
       this._context = null;
     }
   }
@@ -174,10 +168,10 @@
       this.handle = null;
       this.isLoaded = false;
 
-      this._context = Context.allocate();
+      this._context = _context_allocate();
 
       this.on('removed', function() {
-        this._context.release();
+        _context_free();
         this._context = null;
       });
 
@@ -195,7 +189,7 @@
 
     _update() {
       if (this.handle == null && this._effect.isLoaded && this.playOnAdd) {
-        this.handle = this._context.context.play(this._effect._effect);
+        this.handle = this._context.play(this._effect._effect);
         this._commands.forEach(function (v) { v(); });
       }
     }
@@ -282,7 +276,7 @@
      */
     play() {
       if (this.handle == null && this.isLoaded) {
-        this.handle = this._context.context.play(this._effect._effect);
+        this.handle = this._context.play(this._effect._effect);
         this._commands.forEach(function (v) { v(); });
       }
     }
