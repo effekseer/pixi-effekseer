@@ -18,28 +18,19 @@ function main() {
 
   stage.addChild(effekseerRenderer);
 
-  let frameCount = 0;
-
-  function animate() {
-
-    if(frameCount == 10)
-    {
-      var effect = new PIXI.EffekseerEffect('Resource/Laser01.efk');
-      var effekseerEmitter = new PIXI.EffekseerEmitter(effect);
+  var effect = new PIXI.EffekseerEffect('Resource/Laser01.efk');
+  var effekseerEmitter = new PIXI.EffekseerEmitter(effect);
   stage.addChild(effekseerEmitter);
-
   effekseerEmitter.setPosition(128.0, 128.0)
   effekseerEmitter.setScale(20.0, 20.0, 20.0)
 
   // do not play on add automatically
   // you need to call effekseerEmitter.play(); with yourself
   // effekseerEmitter.playOnAdd = false;
-    }
 
+  function animate() {
     requestAnimationFrame(animate);
     renderer.render(stage);
-
-    frameCount += 1;
   }
 
   requestAnimationFrame(animate);
