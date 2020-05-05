@@ -14,11 +14,18 @@ function main() {
   icon.position.y = 256;
   stage.addChild(icon);
 
-  var effect = new PIXI.EffekseerEffect('Resource/Laser01.efk');
   var effekseerRenderer = new PIXI.EffekseerRenderer();
-  var effekseerEmitter = new PIXI.EffekseerEmitter(effect);
 
   stage.addChild(effekseerRenderer);
+
+  let frameCount = 0;
+
+  function animate() {
+
+    if(frameCount == 100)
+    {
+      var effect = new PIXI.EffekseerEffect('Resource/Laser01.efk');
+      var effekseerEmitter = new PIXI.EffekseerEmitter(effect);
   stage.addChild(effekseerEmitter);
 
   effekseerEmitter.setPosition(128.0, 128.0)
@@ -27,10 +34,12 @@ function main() {
   // do not play on add automatically
   // you need to call effekseerEmitter.play(); with yourself
   // effekseerEmitter.playOnAdd = false;
+    }
 
-  function animate() {
     requestAnimationFrame(animate);
     renderer.render(stage);
+
+    frameCount += 1;
   }
 
   requestAnimationFrame(animate);
