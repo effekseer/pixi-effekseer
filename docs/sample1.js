@@ -31,8 +31,6 @@ function main() {
   function animate() {
     requestAnimationFrame(animate);
     renderer.render(stage);
-
-    frameCount += 1;
   }
 
   requestAnimationFrame(animate);
